@@ -101,6 +101,19 @@ class FolderTreeView extends \TYPO3\CMS\Backend\Tree\View\AbstractTreeView {
 	 * @internal
 	 */
 	public function PMiconATagWrap($icon, $cmd, $isExpand = TRUE) {
+
+		if (empty($this->scope)) {
+			$this->scope = array(
+				'class' => get_class($this),
+				'script' => $this->thisScript,
+				'ext_noTempRecyclerDirs' => $this->ext_noTempRecyclerDirs,
+				'browser' => array(
+					'mode' => $GLOBALS['SOBE']->browser->mode,
+					'act' => $GLOBALS['SOBE']->browser->act,
+				),
+			);
+		}
+
 		if ($this->thisScript) {
 			// Activates dynamic AJAX based tree
 			$scopeData = '';

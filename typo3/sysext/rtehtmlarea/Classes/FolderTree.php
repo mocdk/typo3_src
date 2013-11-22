@@ -10,6 +10,15 @@ namespace TYPO3\CMS\Rtehtmlarea;
 class FolderTree extends \rteFolderTree {
 
 	/**
+	 *
+	 */
+	public function __construct() {
+		// The backpath is set her to fix problems with relatives path when used in ajax scope
+		$GLOBALS['BACK_PATH'] = isset($GLOBALS['ajaxID']) ? '../../../' : $GLOBALS['BACK_PATH'];
+		parent::__construct();
+	}
+
+	/**
 	 * Wrapping the title in a link, if applicable.
 	 *
 	 * @param 	string			Title, ready for output.
@@ -36,8 +45,30 @@ class FolderTree extends \rteFolderTree {
 	 * @access private
 	 */
 	public function PMiconATagWrap($icon, $cmd, $isExpand = TRUE) {
+
+		// We need $this->scope to be set for continuously using this class - else we default to using
+		// TYPO3\CMS\Filelist\FileListFolderTree - see TYPO3\CMS\Backend\Controller\FileSystemNavigationFrameController::init()
+		$this->scope = array(
+			'class' => get_class($this),
+			'script' => $this->thisScript,
+			'ext_noTempRecyclerDirs' => $this->ext_noTempRecyclerDirs,
+			'browser' => array(
+				'mode' => $GLOBALS['SOBE']->browser->mode,
+				'act' => $GLOBALS['SOBE']->browser->act,
+			),
+		);
+
 		if ($this->thisScript) {
-			$js = htmlspecialchars('Tree.thisScript=\'' . $GLOBALS['BACK_PATH'] . 'ajax.php\',Tree.load(\'' . $cmd . '\', ' . intval($isExpand) . ', this);');
+			// Activates dynamic AJAX based tree
+			$scopeData = '';
+			$scopeHash = '';
+			// $this->scope is defined in TBE_FolderTree
+			if (!empty($this->scope)) {
+				$scopeData = serialize($this->scope);
+				$scopeHash = \TYPO3\CMS\Core\Utility\GeneralUtility::hmac($scopeData);
+			}
+
+			$js = htmlspecialchars('Tree.thisScript=\'' . $this->backPath . 'ajax.php\',Tree.load(\'' . $cmd . '\', ' . intval($isExpand) . ', this, ' . json_encode($scopeData) . ', \'' . $scopeHash . '\');');
 			return '<a class="pm" onclick="' . $js . '">' . $icon . '</a>';
 		} else {
 			return $icon;
