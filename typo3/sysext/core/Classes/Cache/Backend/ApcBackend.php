@@ -236,7 +236,8 @@ class ApcBackend extends \TYPO3\CMS\Core\Cache\Backend\AbstractBackend implement
 		if (!$this->cache instanceof \TYPO3\CMS\Core\Cache\Frontend\FrontendInterface) {
 			throw new \TYPO3\CMS\Core\Cache\Exception('Yet no cache frontend has been set via setCache().', 1232986971);
 		}
-		$this->flushByTag('%APCBE%' . $this->cacheIdentifier);
+		apc_clear_cache('user');
+		//$this->flushByTag('%APCBE%' . $this->cacheIdentifier);
 	}
 
 	/**

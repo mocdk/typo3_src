@@ -300,7 +300,8 @@ class MemcachedBackend extends \TYPO3\CMS\Core\Cache\Backend\AbstractBackend imp
 		if (!$this->cache instanceof \TYPO3\CMS\Core\Cache\Frontend\FrontendInterface) {
 			throw new \TYPO3\CMS\Core\Cache\Exception('No cache frontend has been set via setCache() yet.', 1204111376);
 		}
-		$this->flushByTag('%MEMCACHEBE%' . $this->cacheIdentifier);
+		$this->memcache->flush();
+		//$this->flushByTag('%MEMCACHEBE%' . $this->cacheIdentifier);
 	}
 
 	/**
